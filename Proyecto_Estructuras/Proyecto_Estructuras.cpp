@@ -29,7 +29,8 @@ bool existeEnLista(NodoLista*, int);
 // Prototipos de funciones para el árbol
 void insertarArbol(NodoArbol*&, int);
 void cargarArbolDesdeLista(NodoArbol*&, NodoLista*);
-void mostrarArbol(NodoArbol*, int);
+void mostrarArbol(NodoArbol*, string, bool);
+void mostrarArbolPrincipal(NodoArbol*);
 int cantidadNodos(NodoArbol*);
 void buscarElemento(NodoArbol*, int);
 bool esHoja(NodoArbol*);
@@ -77,7 +78,7 @@ int main() {
             if (Arbol == NULL) {
                 cout << "El arbol esta vacio." << endl;
             } else {
-                mostrarArbol(Arbol, 0);
+                mostrarArbolPrincipal(Arbol);
             }
             cout << endl;
             system("pause");
@@ -252,19 +253,54 @@ void cargarArbolDesdeLista(NodoArbol*& arbol, NodoLista* lista) {
     }
 }
 
-void mostrarArbol(NodoArbol* arbol, int nivel) {
+void mostrarArbolPrincipal(NodoArbol* arbol) {
+    if (arbol == NULL) {
+        cout << "El arbol esta vacio." << endl;
+        return;
+    }
+    cout << "Raiz: " << arbol->dato << endl;
+    mostrarArbol(arbol, "", true);
+}
+
+void mostrarArbol(NodoArbol* arbol, string prefijo, bool esUltimo) {
     if (arbol == NULL) {
         return;
     }
 
-    mostrarArbol(arbol->derecho, nivel + 1);
+    // Mostrar el prefijo y el conector
+    cout << prefijo;
 
-    for (int i = 0; i < nivel; i++) {
-        cout << "    ";
+    if (esUltimo) {
+        cout << "└── ";
+        prefijo += "    ";
+    } else {
+        cout << "├── ";
+        prefijo += "│   ";
     }
-    cout << arbol->dato << endl;
 
-    mostrarArbol(arbol->izquierdo, nivel + 1);
+    // Determinar si tiene hijos y cuáles
+    bool tieneIzq = (arbol->izquierdo != NULL);
+    bool tieneDer = (arbol->derecho != NULL);
+
+    if (tieneIzq && tieneDer) {
+        cout << arbol->dato << " (I y D)" << endl;
+    } else if (tieneIzq) {
+        cout << arbol->dato << " (I)" << endl;
+    } else if (tieneDer) {
+        cout << arbol->dato << " (D)" << endl;
+    } else {
+        cout << arbol->dato << " (Hoja)" << endl;
+    }
+
+    // Recursión para hijos (primero izquierdo, luego derecho)
+    if (tieneIzq && tieneDer) {
+        mostrarArbol(arbol->izquierdo, prefijo, false);
+        mostrarArbol(arbol->derecho, prefijo, true);
+    } else if (tieneIzq) {
+        mostrarArbol(arbol->izquierdo, prefijo, true);
+    } else if (tieneDer) {
+        mostrarArbol(arbol->derecho, prefijo, true);
+    }
 }
 
 int cantidadNodos(NodoArbol* arbol) {
